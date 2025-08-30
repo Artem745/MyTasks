@@ -1,0 +1,257 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:MyTasks.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="MyTasks.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="My Tasks"
+        FontFamily="{StaticResource Montserrat}"
+        Width="750" Height="600"
+        Background="{Binding ThemeColor1}"
+        Focusable="True"
+        x:Name="MainWindowRoot">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <StackPanel Spacing="30" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0 0 0 0">
+        <Border Width="700" HorizontalAlignment="Center" Background="{Binding ThemeColor2}" Padding="0 10" CornerRadius="20">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Spacing="80">
+                <Border Name="DayTabBorder" BorderThickness="0 0 0 2" BorderBrush="Transparent" Margin="0 0 0 4">
+                    <Interaction.Behaviors>
+                        <EventTriggerBehavior EventName="PointerPressed">
+                            <InvokeCommandAction Command="{Binding ChangeTabCommand}" CommandParameter="day"/>
+                        </EventTriggerBehavior>
+                        <DataTriggerBehavior Binding="{Binding CurrentTab}" Value="day">
+                            <ChangePropertyAction PropertyName="BorderBrush" Value="White"/>
+                        </DataTriggerBehavior>
+                        <DataTriggerBehavior Binding="{Binding CurrentTab}" ComparisonCondition="NotEqual" Value="day">
+                            <ChangePropertyAction PropertyName="BorderBrush" Value="Transparent"/>
+                        </DataTriggerBehavior>
+                    </Interaction.Behaviors>
+                    <TextBlock FontSize="22" FontWeight="Bold">
+                        Day
+                    </TextBlock>
+                </Border>
+                <Border Name="WeekTabBorder" BorderThickness="0 0 0 2" BorderBrush="Transparent" Margin="0 0 0 4">
+                    <Interaction.Behaviors>
+                        <EventTriggerBehavior EventName="PointerPressed">
+                            <InvokeCommandAction Command="{Binding ChangeTabCommand}" CommandParameter="week"/>
+                        </EventTriggerBehavior>
+                        <DataTriggerBehavior Binding="{Binding CurrentTab}" Value="week">
+                            <ChangePropertyAction PropertyName="BorderBrush" Value="White"/>
+                        </DataTriggerBehavior>
+                        <DataTriggerBehavior Binding="{Binding CurrentTab}" ComparisonCondition="NotEqual" Value="week">
+                            <ChangePropertyAction PropertyName="BorderBrush" Value="Transparent"/>
+                        </DataTriggerBehavior>
+                    </Interaction.Behaviors>
+                    <TextBlock FontSize="22" FontWeight="Bold">
+                        Week
+                    </TextBlock>
+                </Border>
+                <Border Name="MonthTabBorder" BorderThickness="0 0 0 2" BorderBrush="Transparent" Margin="0 0 0 4">
+                    <Interaction.Behaviors>
+                        <EventTriggerBehavior EventName="PointerPressed">
+                            <InvokeCommandAction Command="{Binding ChangeTabCommand}" CommandParameter="month"/>
+                        </EventTriggerBehavior>
+                        <DataTriggerBehavior Binding="{Binding CurrentTab}" Value="month">
+                            <ChangePropertyAction PropertyName="BorderBrush" Value="White"/>
+                        </DataTriggerBehavior>
+                        <DataTriggerBehavior Binding="{Binding CurrentTab}" ComparisonCondition="NotEqual" Value="month">
+                            <ChangePropertyAction PropertyName="BorderBrush" Value="Transparent"/>
+                        </DataTriggerBehavior>
+                    </Interaction.Behaviors>
+                    <TextBlock FontSize="22" FontWeight="Bold">
+                        Month
+                    </TextBlock>
+                </Border>
+            </StackPanel>
+        </Border>
+        
+        <Border Width="700" Height="370" HorizontalAlignment="Center" Background="{Binding ThemeColor2}" CornerRadius="20">
+            <StackPanel HorizontalAlignment="Center" Width="640">
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0 15" Spacing="15">
+                    <TextBox Text="{Binding Name}" Width="150" VerticalAlignment="Center" BorderThickness="0" Background="{Binding ThemeColor1}" Watermark="Name" CornerRadius="10"/>
+                    <TextBox Text="{Binding Description}" Width="250" VerticalAlignment="Center" BorderThickness="0" Background="{Binding ThemeColor1}" Watermark="Description" CornerRadius="10"/>
+                    <ComboBox SelectedIndex="{Binding SelectedIndexDifficulty}" SelectedItem="{Binding Difficulty}" Background="{Binding ThemeColor1}" BorderThickness="0" CornerRadius="10" FontWeight="500" >
+                        <ComboBoxItem IsEnabled="False">
+                            <TextBlock Foreground="DarkGray">Difficulty</TextBlock>    
+                        </ComboBoxItem>
+                        <ComboBoxItem>Easy</ComboBoxItem>
+                        <ComboBoxItem>Medium</ComboBoxItem>
+                        <ComboBoxItem>Hard</ComboBoxItem>
+                    </ComboBox>
+                    <Button Command="{Binding AddTaskCommand}" Background="#1e871e" Padding="10 6" >Add</Button>
+                </StackPanel>
+
+                <StackPanel Name="EmptyBlock" IsVisible="False">
+                    <Border>
+                        <TextBlock FontSize="24" FontWeight="SemiBold">No tasks yet, try create a new one :)</TextBlock>
+                    </Border>
+                </StackPanel>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Height="300">
+                    <ItemsControl ItemsSource="{Binding TasksList}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate >
+                                <StackPanel IsVisible="True" Spacing="10" Margin="0 10">
+                                    <!-- Background="{Binding ThemeColor1, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}" -->
+                                    <Border Background="{Binding DataContext.ThemeColor1, ElementName=MainWindowRoot}"  CornerRadius="10" MinHeight="70">
+                                        <Grid ColumnDefinitions="20,*,Auto" ColumnSpacing="10">
+                                            <Border Grid.Column="0" BorderThickness="3" BorderBrush="{Binding DifficultyColor}" CornerRadius="10 0 0 10" VerticalAlignment="Stretch">
+                                                <TextBlock Width="50" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="10" LetterSpacing="1" Foreground="{Binding DifficultyColor}" Text="{Binding Difficulty}">
+                                                    <TextBlock.RenderTransform>
+                                                        <RotateTransform Angle="270"/>
+                                                    </TextBlock.RenderTransform>
+                                                </TextBlock>
+                                            </Border>
+                                            <StackPanel Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Vertical">
+                                                <TextBlock FontSize="24" FontWeight="SemiBold" TextWrapping="Wrap" Text="{Binding Name}"></TextBlock>
+                                                <TextBlock FontSize="16" Foreground="#dddddd" FontWeight="Regular" TextWrapping="Wrap" Text="{Binding Description}"></TextBlock>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Top" Spacing="5" Orientation="Horizontal" Margin="10">
+                                                <Button Background="Red" Content="🗑️" Command="{Binding DataContext.RemoveTaskCommand, ElementName=MainWindowRoot}" CommandParameter="{Binding Id}"></Button>
+                                                <Button Background="{Binding DoneColor}" Content="{Binding IsDone}" Command="{Binding DataContext.DoneTaskCommand, ElementName=MainWindowRoot}" CommandParameter="{Binding Id}"></Button>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </StackPanel>
+        </Border>
+            
+        <Border Width="700" HorizontalAlignment="Center" Background="{Binding ThemeColor2}" CornerRadius="20" Padding="20 10">
+            <StackPanel HorizontalAlignment="Stretch" Spacing="5">
+                <Grid ColumnDefinitions="*,auto"> 
+                    <StackPanel Grid.Column="0">
+                        <TextBlock FontSize="24" FontWeight="SemiBold" Text="{Binding ProgressText}" ></TextBlock>
+                        <Grid Height="6" Margin="0 5 0 0">
+                            <Border BorderBrush="{Binding ThemeColor1}" BorderThickness="0 6 0 6" CornerRadius="5" Height="6" HorizontalAlignment="Left" Width="660"></Border>
+                            <Border BorderBrush="LightBlue" BorderThickness="0 6 0 6" CornerRadius="5" Height="6" HorizontalAlignment="Left" Width="{Binding ProgressWidth}">
+                                <Border.Transitions>
+                                    <Transitions>
+                                        <DoubleTransition Property="Width" Duration="0:0:0.3" Easing="CubicEaseInOut"/>
+                                    </Transitions>
+                                </Border.Transitions>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="7" VerticalAlignment="Top">
+                        <Grid>
+                            <Interaction.Behaviors>
+                                <EventTriggerBehavior EventName="PointerPressed">
+                                    <InvokeCommandAction Command="{Binding ChangeThemeCommand}" CommandParameter="#1c481e,#246027"/>
+                                </EventTriggerBehavior>
+                            </Interaction.Behaviors>
+                            <Ellipse Width="28" Height="20" Fill="#1c481e">
+                                <Ellipse.Clip>
+                                    <RectangleGeometry Rect="0,0,15,28"/>
+                                </Ellipse.Clip> 
+                            </Ellipse>
+                            <Ellipse Stroke="#1c481e" StrokeThickness="2" Width="28" Height="20" Fill="#246027">
+                                <Ellipse.Clip>
+                                    <RectangleGeometry Rect="13,0,15,28"/>
+                                </Ellipse.Clip> 
+                            </Ellipse>
+                        </Grid>
+                        <Grid>
+                            <Interaction.Behaviors>
+                                <EventTriggerBehavior EventName="PointerPressed">
+                                    <InvokeCommandAction Command="{Binding ChangeThemeCommand}" CommandParameter="#005887,#006eaa"/>
+                                </EventTriggerBehavior>
+                            </Interaction.Behaviors>
+                            <Ellipse Width="28" Height="20" Fill="#005887">
+                                <Ellipse.Clip>
+                                    <RectangleGeometry Rect="0,0,15,28"/>
+                                </Ellipse.Clip> 
+                            </Ellipse>
+                            <Ellipse Stroke="#00527e" StrokeThickness="2" Width="28" Height="20" Fill="#006eaa">
+                                <Ellipse.Clip>
+                                    <RectangleGeometry Rect="13,0,15,28"/>
+                                </Ellipse.Clip> 
+                            </Ellipse>
+                        </Grid>
+                        <Grid>
+                            <Interaction.Behaviors>
+                                <EventTriggerBehavior EventName="PointerPressed">
+                                    <InvokeCommandAction Command="{Binding ChangeThemeCommand}" CommandParameter="#9d4f00,#ce6700"/>
+                                </EventTriggerBehavior>
+                            </Interaction.Behaviors>
+                            <Ellipse Width="28" Height="20" Fill="#9d4f00">
+                                <Ellipse.Clip>
+                                    <RectangleGeometry Rect="0,0,15,28"/>
+                                </Ellipse.Clip> 
+                            </Ellipse>
+                            <Ellipse Stroke="#9d4f00" StrokeThickness="2" Width="28" Height="20" Fill="#ce6700">
+                                <Ellipse.Clip>
+                                    <RectangleGeometry Rect="13,0,15,28"/>
+                                </Ellipse.Clip> 
+                            </Ellipse>
+                        </Grid>
+                        <Grid>
+                            <Interaction.Behaviors>
+                                <EventTriggerBehavior EventName="PointerPressed">
+                                    <InvokeCommandAction Command="{Binding ChangeThemeCommand}" CommandParameter="#45135a,#631b83"/>
+                                </EventTriggerBehavior>
+                            </Interaction.Behaviors>
+                            <Ellipse Width="28" Height="20" Fill="#45135a">
+                                <Ellipse.Clip>
+                                    <RectangleGeometry Rect="0,0,15,28"/>
+                                </Ellipse.Clip> 
+                            </Ellipse>
+                            <Ellipse Stroke="#45135a" StrokeThickness="2" Width="28" Height="20" Fill="#631b83">
+                                <Ellipse.Clip>
+                                    <RectangleGeometry Rect="13,0,15,28"/>
+                                </Ellipse.Clip> 
+                            </Ellipse>
+                        </Grid>
+                        <Grid>
+                            <Interaction.Behaviors>
+                                <EventTriggerBehavior EventName="PointerPressed">
+                                    <InvokeCommandAction Command="{Binding ChangeThemeCommand}" CommandParameter="#797979,#9e9e9e"/>
+                                </EventTriggerBehavior>
+                            </Interaction.Behaviors>
+                            <Ellipse Width="28" Height="20" Fill="#797979">
+                                <Ellipse.Clip>
+                                    <RectangleGeometry Rect="0,0,15,28"/>
+                                </Ellipse.Clip> 
+                            </Ellipse>
+                            <Ellipse Stroke="#797979" StrokeThickness="2" Width="28" Height="20" Fill="#9e9e9e">
+                                <Ellipse.Clip>
+                                    <RectangleGeometry Rect="13,0,15,28"/>
+                                </Ellipse.Clip> 
+                            </Ellipse>
+                        </Grid>
+                        <Grid>
+                            <Interaction.Behaviors>
+                                <EventTriggerBehavior EventName="PointerPressed">
+                                    <InvokeCommandAction Command="{Binding ChangeThemeCommand}" CommandParameter="#404040,#4f4f4f"/>
+                                </EventTriggerBehavior>
+                            </Interaction.Behaviors>
+                            <Ellipse Width="28" Height="20" Fill="#404040">
+                                <Ellipse.Clip>
+                                    <RectangleGeometry Rect="0,0,15,28"/>
+                                </Ellipse.Clip> 
+                            </Ellipse>
+                            <Ellipse Stroke="#404040" StrokeThickness="2" Width="28" Height="20" Fill="#4f4f4f">
+                                <Ellipse.Clip>
+                                    <RectangleGeometry Rect="13,0,15,28"/>
+                                </Ellipse.Clip> 
+                            </Ellipse>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Border>
+    </StackPanel> 
+
+</Window>
