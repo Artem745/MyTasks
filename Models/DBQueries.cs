@@ -52,18 +52,9 @@ namespace MyTasks
             connection.Open();
             var command = connection.CreateCommand();
 
-            command.CommandText = "SELECT isDone FROM Task WHERE id = $id";
+            // Toggle isDone atomically in SQL to avoid race conditions and simplify logic
+            command.CommandText = "UPDATE Task SET isDone = 1 - isDone WHERE id = $id";
             command.Parameters.AddWithValue("$id", Id);
-            int IsDone = 0;
-            using (var reader = command.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    IsDone = 1 - Convert.ToInt32(reader.GetString(0));
-                }
-            }
-            command.CommandText = "UPDATE Task SET isDone = $isDone WHERE id = $id";
-            command.Parameters.AddWithValue("$isDone", IsDone);
             command.ExecuteNonQuery();
         }
 

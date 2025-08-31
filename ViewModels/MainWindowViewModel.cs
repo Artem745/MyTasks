@@ -104,9 +104,9 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand(CanExecute = nameof(CanAdd))]
     private void AddTask()
     {
-        string? Diff = Difficulty?.Content?.ToString();
-        if (Diff != null && Diff == "Avalonia.Controls.TextBlock")
-            Diff = "";
+        string? Diff = null;
+        if (Difficulty is ComboBoxItem cb && cb.Content is string s)
+            Diff = s;
         DBQueries.InsertDB(Name, Description, Diff ?? "", CurrentTab);
         ObservableCollection<MyTask> myTasks = DBQueries.SelectDB(CurrentTab);
         Name = "";

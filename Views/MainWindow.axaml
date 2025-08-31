@@ -101,7 +101,6 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate >
                                 <StackPanel IsVisible="True" Spacing="10" Margin="0 10">
-                                    <!-- Background="{Binding ThemeColor1, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}" -->
                                     <Border Background="{Binding DataContext.ThemeColor1, ElementName=MainWindowRoot}"  CornerRadius="10" MinHeight="70">
                                         <Grid ColumnDefinitions="20,*,Auto" ColumnSpacing="10">
                                             <Border Grid.Column="0" BorderThickness="3" BorderBrush="{Binding DifficultyColor}" CornerRadius="10 0 0 10" VerticalAlignment="Stretch">
@@ -253,5 +252,4 @@
             </StackPanel>
         </Border>
     </StackPanel> 
-
 </Window>
